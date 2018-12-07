@@ -65,17 +65,18 @@ if __name__ == "__main__":
     df["WLL"] = wll["Adj Close"]
 
     # Plot the two time series
-    #plot_price_series(df, "AREX", "WLL")
+    plot_price_series(df, "AREX", "WLL")
 
     # Display a scatter plot of the two time series
-    #plot_scatter_series(df, "AREX", "WLL")
+    plot_scatter_series(df, "AREX", "WLL")
 
     # Calculate optimal hedge ratio "beta"
     res = smf.ols(formula='WLL ~ AREX ', data=df).fit()
     #res = smf.ols(y=df['WLL'], x=df["AREX"])
     print(res.summary())
-    beta_hr = res.params
+    beta_hr = res.params.AREX
 
+    beta_hr * df["AREX"]
     # Calculate the residuals of the linear combination
     df["res"] = df["WLL"] - beta_hr*df["AREX"]
 
