@@ -60,7 +60,10 @@ if __name__ == "__main__":
     arex = web.DataReader("AREX", "yahoo", start, end)
     wll = web.DataReader("WLL", "yahoo", start, end)
 
+    #print(arex.index)
+    #print(arex)
     df = pd.DataFrame(index=arex.index)
+    print(df)
     df["AREX"] = arex["Adj Close"]
     df["WLL"] = wll["Adj Close"]
 

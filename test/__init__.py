@@ -1,3 +1,4 @@
+#OLS回归测试代码
 import numpy as np
 import pandas as pd
 # import statsmodels.api as sm #方法一
