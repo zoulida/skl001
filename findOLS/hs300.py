@@ -80,7 +80,8 @@ def cadf(df):
 
     # Plot the residuals
     #plot_residuals(df)
-
+    #print(df)
+    #print(df["res"])
     # Calculate and output the CADF test on the residuals
     cadf = tsst.adfuller(df["res"])
     #print(cadf[1])
@@ -143,6 +144,8 @@ def compare(code1, code2):
     # cadf2.plot_scatter_series(df3, "X", "Y")
 
     start = datetime.datetime.now()
+    if df3.shape[0] < 10:
+        return None
     # OLS 回归
     cadfTuple = cadf(df3)
     end = datetime.datetime.now()
@@ -188,11 +191,16 @@ def ALLStocksgogo(list):
     for index, row in list.iterrows():
         # print(index, row)
         for index2, row2 in list2.iterrows():
-            if i >= 10:
+            if i >= 90000:
                 break
             # print (index)
             print('开始测试平稳性   ', index, ' ', index2)
-            ss = compare(index, index2)
+            try:
+                ss = compare(index, index2)
+            except Exception as e:
+                print('traceback.print_exc():', e)
+                # 如果以上插入过程出错，跳过这条数据记录，继续往下进行
+                continue  # break
             insertRow = pd.DataFrame([[index, index2, ss]], columns=['A', 'B', 'adf'])
             df_result = df_result.append(insertRow, ignore_index=False)
             i = i + 1
