@@ -56,9 +56,13 @@ def plot_price_series_stock(df, ts1, ts2):
     plt.xlabel('Month/Year')
     plt.ylabel('Price ($)')
     #print('dfsdfdsaf ddddddddd',list[list.code == ts1].iloc[0, 2])
-    namestock1 = list[list.code == ts1].iloc[0, 2]
-    namestock2 = list[list.code == ts2].iloc[0, 2]
-
+    if stockRange == 'hs300':
+        namestock1 = list[list.code == ts1].iloc[0, 2]
+        namestock2 = list[list.code == ts2].iloc[0, 2]
+    else:
+        namestock1 = list.loc[ts1].iloc[0]
+        namestock2 = list.loc[ts2].iloc[0]
+        #print('tttttttttt' , namestock1)
     plt.title('%s and %s Daily Prices' % (namestock1, namestock2))
     plt.legend()
     plt.show()
@@ -156,30 +160,60 @@ def showTop10(int,df_result2):
 
     #print(df_result2.iloc[1, 3])
 
+def hs300gogo(list):
+    list2 = list
+    # compare('600016','000540')
+    df_result = pd.DataFrame(columns=['A', 'B', 'adf'])
+    i = 0
 
+    for index, row in list.iterrows():
+        # print(index, row)
+        for index2, row2 in list2.iterrows():
+            if i >= 10:
+                break
+            # print (index)
+            print('开始测试平稳性   ', row.code, ' ', row2.code)
+            ss = compare(row.code, row2.code)
+            insertRow = pd.DataFrame([[row.code, row2.code, ss]], columns=['A', 'B', 'adf'])
+            df_result = df_result.append(insertRow, ignore_index=False)
+            i = i + 1
+    return df_result
+
+def ALLStocksgogo(list):
+    list2 = list
+    # compare('600016','000540')
+    df_result = pd.DataFrame(columns=['A', 'B', 'adf'])
+    i = 0
+
+    for index, row in list.iterrows():
+        # print(index, row)
+        for index2, row2 in list2.iterrows():
+            if i >= 10:
+                break
+            # print (index)
+            print('开始测试平稳性   ', index, ' ', index2)
+            ss = compare(index, index2)
+            insertRow = pd.DataFrame([[index, index2, ss]], columns=['A', 'B', 'adf'])
+            df_result = df_result.append(insertRow, ignore_index=False)
+            i = i + 1
+    return df_result
 
 #if __name__ == "__main__":#######################################=================================================================
 plt.rcParams['font.family'] = 'SimHei' #解决plt中文乱码
-list = ts.get_hs300s()
-#print(list)
-list2 = list
-#compare('600016','000540')
-df_result = pd.DataFrame(columns=['A', 'B', 'adf'])
-i = 0
+#stockRange = 'hs300' # all
+stockRange = 'all' # all
 start = datetime.datetime.now()
-for index,row in list.iterrows():
-    for index2,row2 in list2.iterrows():
-        if i >= 10:
-            break
-        #print (index)
-        print ('开始测试平稳性   ',row.code,' ',row2.code)
-        ss = compare(row.code,row2.code)
-        insertRow = pd.DataFrame([[row.code, row2.code, ss]], columns=['A', 'B', 'adf'])
-        df_result = df_result.append(insertRow,ignore_index=False)
-        i = i+1
+if stockRange == 'hs300':
+    list = ts.get_hs300s()
+    df_result = hs300gogo(list)
+else:
+    list = ts.get_stock_basics()
+    df_result = ALLStocksgogo(list)
+#print('ttttttttttttttt',df_result)
+
 end = datetime.datetime.now()
 print('消耗时间 ' , (end - start).total_seconds())
-df_result2 = df_result.sort_values(by = 'adf',axis = 0,ascending = True )
+df_result2 = df_result.sort_values(by = 'adf',axis = 0,ascending = True )#排序adf
 print(df_result2)
 showTop10(5,df_result2)
 #print(list)
