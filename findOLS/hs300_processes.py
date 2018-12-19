@@ -378,7 +378,7 @@ if __name__ == '__main__':
 
     startdate = '2017-12-09'
     enddate = '2018-12-14'
-    loopnum = 100000 #最大比较次数
+    loopnum = 10 #最大比较次数
     dict['startdate'] = startdate
     dict['enddate'] = enddate
 
@@ -406,6 +406,8 @@ if __name__ == '__main__':
     df_result2 = df_result.sort_values(by = 'adf',axis = 0,ascending = True )#排序adf
     print(df_result2)
     print('消耗时间 ' , (end - start).total_seconds())
+
+    df_result2.to_csv('%s_%s_%s_%s_Result.csv'% (end.year, end.month, end.day, end.timestamp()))
     #bb=pd.DataFrame(df_result2)
     #print(bb)
     showTop10(5,df_result2)
