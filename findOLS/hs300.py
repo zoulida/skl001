@@ -307,14 +307,14 @@ def ALLStocksPools(list):#循环比较
             # print (index)
             print('提交任务   ', index, ' ', index2)
 
-            future = executor.submit(compareTask, index, index2)
+            future = executor.submit(compareTask, index, index2, i)
             f_list.append(future)
     print(wait(f_list))
 
     return df_result
 
-def compareTask(index,index2):
-    print('开始测试平稳性   ', index, ' ', index2)
+def compareTask(index,index2, i):
+    print('开始测试平稳性   ', index, ' ', index2, ' ', i)
     try:
         ss = compare(index, index2)
         insertRow = pd.DataFrame([[index, index2, ss]], columns=['A', 'B', 'adf'])
