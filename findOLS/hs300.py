@@ -110,7 +110,7 @@ def plot_residuals(df):
     plt.plot(df["res"])
     plt.show()
 def getPAIRdata_memory(code1, code2):#数据整理,基于内存
-
+    #global startdate
     #print(dict.get(code1))
     if dict.get(code1) is None:
         dict[code1] = dbQueryTools.queryMySQL(code1, startdate , enddate )
@@ -276,17 +276,9 @@ def ALLStocksgogo(list):#循环比较
 
     return df_result
 
-def ALLStocksPools(list):#循环比较
+def ALLStocksPools(list):#循环比较多线程
     from concurrent.futures import ThreadPoolExecutor,wait,as_completed
-    import urllib.request
-    '''URLS = ['http://www.163.com', 'https://www.baidu.com/', 'https://github.com/']
-    def load_url(url):
-        with urllib.request.urlopen(url, timeout=60) as conn:
-            print('%r page is %d bytes' % (url, len(conn.read())))
-            list_a.append('ddd')
-        return len(conn.read())'''
 
-    #list_a = []
 
     executor = ThreadPoolExecutor(max_workers)
 
@@ -313,6 +305,27 @@ def ALLStocksPools(list):#循环比较
 
     return df_result
 
+
+def ALLStocksProcessPools(list):#循环比较多进程
+    import multiprocessing
+    pool = multiprocessing.Pool(processes = 10)
+    list2 = list
+    i = 0 #计数器
+    for index, row in list.iterrows():
+        # print(index, row)
+        for index2, row2 in list2.iterrows():
+            if i >= loopnum:
+                break
+            i = i + 1
+            # print (index)
+            print('提交任务   ', index, ' ', index2)
+            pool.apply_async(compareTask, (index, index2, i))
+    print("Mark~ Mark~ Mark~~~~~~~~~~~~~~~~~~~~~~")
+    pool.close()
+    pool.join()   #调用join之前，先调用close函数，否则会出错。执行完close后不会有新的进程加入到pool,join函数等待所有子进程结束
+    print ("Sub-process(es) done.")
+    return df_result
+
 def compareTask(index,index2, i):
     print('开始测试平稳性   ', index, ' ', index2, ' ', i)
     try:
@@ -331,35 +344,36 @@ def compareTask(index,index2, i):
 
 dict = {}
 df_result = pd.DataFrame(columns=['A', 'B', 'adf'])
-#if __name__ == "__main__":#######################################=================================================================
-plt.rcParams['font.family'] = 'SimHei' #解决plt中文乱码
-startdate = '2017-12-09'
-enddate = '2018-12-14'
-loopnum = 100000
-max_workers = 10
-#stockRange = 'hs300' # all
-#stockRange = 'all' # all
-stockRange = 'allPools' # 用多线程完成
-start = datetime.datetime.now()
-if stockRange == 'hs300':
-    list = ts.get_hs300s()
-    df_result = hs300gogo(list)
-if stockRange == 'all':
-    list = ts.get_stock_basics()
-    df_result = ALLStocksgogo(list)
-if stockRange == 'allPools':
+if __name__ == "__main__":#######################################=================================================================
+    plt.rcParams['font.family'] = 'SimHei' #解决plt中文乱码
+    startdate = '2017-12-09'
+    enddate = '2018-12-14'
+    loopnum = 10
 
-    list = ts.get_stock_basics()
-    ALLStocksPools(list)
-#print('ttttttttttttttt',df_result)
+    #stockRange = 'hs300' # all
+    #stockRange = 'all' # all
+    stockRange = 'allPools' # 用多线程完成
+    start = datetime.datetime.now()
+    if stockRange == 'hs300':
+        list = ts.get_hs300s()
+        df_result = hs300gogo(list)
+    if stockRange == 'all':
+        list = ts.get_stock_basics()
+        df_result = ALLStocksgogo(list)
+    if stockRange == 'allPools':
+        max_workers = 10
+        list = ts.get_stock_basics()
+        ALLStocksPools(list)
+        #ALLStocksProcessPools(list)
+    #print('ttttttttttttttt',df_result)
 
-end = datetime.datetime.now()
-#print('消耗时间 ' , (end - start).total_seconds())
-df_result2 = df_result.sort_values(by = 'adf',axis = 0,ascending = True )#排序adf
-print(df_result2)
-print('消耗时间 ' , (end - start).total_seconds())
-#bb=pd.DataFrame(df_result2)
-#print(bb)
-showTop10(5,df_result2)
-#print(list)
+    end = datetime.datetime.now()
+    #print('消耗时间 ' , (end - start).total_seconds())
+    df_result2 = df_result.sort_values(by = 'adf',axis = 0,ascending = True )#排序adf
+    print(df_result2)
+    print('消耗时间 ' , (end - start).total_seconds())
+    #bb=pd.DataFrame(df_result2)
+    #print(bb)
+    showTop10(5,df_result2)
+    #print(list)
 

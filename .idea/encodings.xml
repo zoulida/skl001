@@ -3,6 +3,8 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/findOLS/dbQueryTools.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/test/future.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/test/processShares.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/test/processValues.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/test/test3.py" charset="UTF-8" />
   </component>
 </project>

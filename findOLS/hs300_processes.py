@@ -378,7 +378,7 @@ if __name__ == '__main__':
 
     startdate = '2017-12-09'
     enddate = '2018-12-14'
-    loopnum = 10000 #最大比较次数
+    loopnum = 100000 #最大比较次数
     dict['startdate'] = startdate
     dict['enddate'] = enddate
 
