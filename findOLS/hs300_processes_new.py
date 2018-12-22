@@ -311,7 +311,7 @@ def ALLStocksPools(list):#循环比较多线程
 
 
 def ALLStocksProcessPools(list):#循环比较多进程
-
+    res_l=[]
     start = time.time()
     from multiprocessing import cpu_count
     #print(cpu_count())
@@ -326,7 +326,10 @@ def ALLStocksProcessPools(list):#循环比较多进程
             i = i + 1
             # print (index)
             print('提交任务   ', index, ' ', index2)
-            pool.apply_async(compareTask, (index, index2, i, dict), callback=mycallback)#apply_async(func[, args[, kwds[, callback[, error_callback]]]])
+            insertRow = pool.apply_async(compareTask, (index, index2, i, dict), callback=None)#apply_async(func[, args[, kwds[, callback[, error_callback]]]])
+            res_l.append(insertRow)
+            #print(insertRow.get())
+            #df_result = df_result.append(insertRow, ignore_index=False)
     print("Mark~ Mark~ Mark~~~~~~~~~~~~~~~~~~~~~~")
     pool.close()
     pool.join()   #调用join之前，先调用close函数，否则会出错。执行完close后不会有新的进程加入到pool,join函数等待所有子进程结束
@@ -334,7 +337,7 @@ def ALLStocksProcessPools(list):#循环比较多进程
     stop = time.time()
     print ('delay: %.3fs' % (stop - start))
     #print(df_result)
-    return df_result
+    return res_l
 
 def compareTask(index, index2, i, dict):
     print('开始测试平稳性   ', index, ' ', index2, ' ', i)
@@ -405,7 +408,10 @@ if __name__ == '__main__':
         from multiprocessing import cpu_count
         max_workers = cpu_count() * 2 +2
         list = ts.get_stock_basics()
-        ALLStocksProcessPools(list)
+        res_l = ALLStocksProcessPools(list)
+        for res in res_l:
+            print('正在提取结果：  ', df_result.shape[0] )
+            df_result = df_result.append(res.get(), ignore_index=False) #df_result.append(res.get())
 
     end = datetime.datetime.now()
     #print('消耗时间 ' , (end - start).total_seconds())
