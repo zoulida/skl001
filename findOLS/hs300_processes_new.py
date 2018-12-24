@@ -385,9 +385,9 @@ if __name__ == '__main__':
     #print(dict)
     df_result = pd.DataFrame(columns=['A', 'B', 'adf'])
 
-    startdate = '2017-12-09'
-    enddate = '2018-12-14'
-    loopnum = 1000000 #最大比较次数        # 100000约需要20分钟
+    startdate = '2015-12-09'
+    enddate = '2018-12-23'
+    loopnum = 100000 #最大比较次数        # 100000约需要20分钟
     dict['startdate'] = startdate
     dict['enddate'] = enddate
 
@@ -408,17 +408,31 @@ if __name__ == '__main__':
         from multiprocessing import cpu_count
         max_workers = cpu_count() * 2 +2
         list = ts.get_stock_basics()
+        startPools = datetime.datetime.now()
         res_l = ALLStocksProcessPools(list)
-        for res in res_l:
-            print('正在提取结果：  ', df_result.shape[0] )
-            df_result = df_result.append(res.get(), ignore_index=False) #df_result.append(res.get())
+        endPools = datetime.datetime.now()
+        #print('多进程消耗时间 ' , (endPools - startPools).total_seconds())
 
+        time = datetime.datetime.now()
+        listtemp5 = []
+        for res in res_l:
+            spend = (time - datetime.datetime.now()).total_seconds()
+            time = datetime.datetime.now()
+            print('正在提取结果：  ', listtemp5.__len__(),'   ; 上次消耗时间 ' , spend)
+            try:
+                listtemp5.append(res.get())
+                #df_result = df_result.append(res.get(), ignore_index=False) #df_result.append(res.get())
+            except Exception as e:
+                print('traceback.print_exc():', e)
+                traceback.print_exc()
+        #print('list5= ' , listtemp5)
+        df_result = df_result.append(listtemp5)
     end = datetime.datetime.now()
     #print('消耗时间 ' , (end - start).total_seconds())
     df_result2 = df_result.sort_values(by = 'adf',axis = 0,ascending = True )#排序adf
     print(df_result2)
     print('消耗时间 ' , (end - start).total_seconds())
-
+    print('多进程消耗时间 ' , (endPools - startPools).total_seconds())
     df_result2.to_csv('%s_%s_%s_%s_Result.csv'% (end.year, end.month, end.day, end.timestamp()))
     #bb=pd.DataFrame(df_result2)
     #print(bb)
