@@ -21,12 +21,17 @@ def queryMySQL(code1, startdate = '2017-12-09', enddate = '2018-12-09'):
     #print(str)
     code = 'stock_'+code1
     #print(code)
-    cursor.execute('select * from %s where 日期 between \'%s\'' % (code , startdate) + ' and \'%s\'' % enddate)
+    sqlstr = 'select * from %s where 日期 between \'%s\'' % (code , startdate) + ' and \'%s\'' % enddate
+    #print(sqlstr)
+    cursor.execute(sqlstr)
     #cursor.execute('select * from stock_600016 where 收盘价 = 18.56')
     results = cursor.fetchall()
     df = pd.DataFrame(list(results))
     #df2 = df.rename(columns={'0': 'timestamp', '1': 'data', '4': 'close', '5': 'price', '6': 'e'} , inplace=True)
     df.rename(columns={1:'date', 4: 'close'} , inplace=True)
+    #print('这个是我', df)
+    if df.shape[0] < 1:
+        return df
     df2 = df.set_index(['date'])
     #print(df)
     #print(df.columns.values.tolist())

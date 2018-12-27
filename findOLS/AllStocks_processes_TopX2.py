@@ -351,7 +351,8 @@ def compareTask(index, index2, i, dict):
         ss = compare(index, index2, dict)
         if ss is None:
             return None
-        insertRow = pd.DataFrame([[index, index2, ss]], columns=['A', 'B', 'adf'])
+        #insertRow = pd.DataFrame([[index, index2, ss]], columns=['A', 'B', 'adf'])
+        insertRow = (index, index2, ss)
         #global df_result #如果确定要引用全局变量，并且要对它修改，必须加上global关键字。
         #df_result = df_result.append(insertRow, ignore_index=False)
     except Exception as e:
@@ -394,7 +395,7 @@ if __name__ == '__main__':
 
     startdate = '2015-12-09'
     enddate = '2018-12-23'
-    loopnum = 10000 #最大比较次数        # 100000约需要20分钟
+    loopnum = 10 #最大比较次数        # 100000约需要20分钟
     dict['startdate'] = startdate
     dict['enddate'] = enddate
 
@@ -432,8 +433,9 @@ if __name__ == '__main__':
             except Exception as e:
                 print('traceback.print_exc():', e)
                 traceback.print_exc()
-        #print('list5= ' , listtemp5)
-        df_result = df_result.append(listtemp5)
+        print('list5= ' , listtemp5)
+        df_result = pd.DataFrame(listtemp5, columns=['A', 'B', 'adf'])
+        #df_result = df_result.append(listtemp5)
     end = datetime.datetime.now()
     #print('消耗时间 ' , (end - start).total_seconds())
     df_result = df_result.dropna()#去除NAN

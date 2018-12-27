@@ -146,15 +146,7 @@ def getPAIRdata_memory(code1, code2, dict):#数据整理,基于内存
     return df3
     #return
 def getPAIRdata_database(code1, code2):#数据整理,基于数据库
-    ####df_X = ts.get_hist_data(code1, start='2017-12-09', end='2018-12-14')#时间区间设置
-    ####df_Y = ts.get_hist_data(code2, start='2017-12-09', end='2018-12-09')
 
-
-    #try:
-    #df_X = ts.get_hist_data(code1, startdate, enddate)
-    #df_Y = ts.get_hist_data(code2, startdate, enddate)
-    # df = ts.get_hist_data('600848') #一次性获取全部日k线数据
-    #from findOLS import dbQueryTools
     df_X = dbQueryTools.queryMySQL(code1, startdate , enddate )
     df_Y = dbQueryTools.queryMySQL(code2, startdate , enddate )
     #print(df_Y)
@@ -179,10 +171,6 @@ def getPAIRdata_database(code1, code2):#数据整理,基于数据库
     #print(df3)
     return df3
 def getPAIRdata(code1, code2):#数据整理
-    ####df_X = ts.get_hist_data(code1, start='2017-12-09', end='2018-12-14')#时间区间设置
-    ####df_Y = ts.get_hist_data(code2, start='2017-12-09', end='2018-12-09')
-
-
 
     df_X = ts.get_hist_data(code1, startdate, enddate)
     df_Y = ts.get_hist_data(code2, startdate, enddate)
@@ -351,7 +339,8 @@ def compareTask(index, index2, i, dict):
         ss = compare(index, index2, dict)
         if ss is None:
             return None
-        insertRow = pd.DataFrame([[index, index2, ss]], columns=['A', 'B', 'adf'])
+        #insertRow = pd.DataFrame([[index, index2, ss]], columns=['A', 'B', 'adf'])
+        insertRow = (index, index2, ss )
         #global df_result #如果确定要引用全局变量，并且要对它修改，必须加上global关键字。
         #df_result = df_result.append(insertRow, ignore_index=False)
     except Exception as e:
@@ -385,6 +374,32 @@ def sayHi(num):#作废
     #print(num)
     return insertRow
 
+'''def runALLStocksProcessPools():
+    from multiprocessing import cpu_count
+        max_workers = cpu_count() * 2 + 2
+        list = ts.get_stock_basics()
+        startPools = datetime.datetime.now()
+        res_l = ALLStocksProcessPools(list)
+        endPools = datetime.datetime.now()
+        #print('多进程消耗时间 ' , (endPools - startPools).total_seconds())
+
+        time = datetime.datetime.now()
+        listtemp5 = []
+        for res in res_l:
+            spend = (time - datetime.datetime.now()).total_seconds()
+            time = datetime.datetime.now()
+            print('正在提取结果：  ', listtemp5.__len__(),'   ; 上次消耗时间 ' , spend)
+            try:
+                listtemp5.append(res.get())
+                #df_result = df_result.append(res.get(), ignore_index=False) #df_result.append(res.get())
+            except Exception as e:
+                print('traceback.print_exc():', e)
+                traceback.print_exc()
+        print('list5= ' , listtemp5)
+        df_result = pd.DataFrame(listtemp5, columns=['A', 'B', 'adf'])
+        #df_result = df_result.append(listtemp5)'''
+
+
 if __name__ == '__main__':
     plt.rcParams['font.family'] = 'SimHei' #解决plt中文乱码
     m = Manager()
@@ -394,7 +409,7 @@ if __name__ == '__main__':
 
     startdate = '2015-12-09'
     enddate = '2018-12-23'
-    loopnum = 10000 #最大比较次数        # 100000约需要20分钟
+    loopnum = 100000 #最大比较次数        # 100000约需要20分钟
     dict['startdate'] = startdate
     dict['enddate'] = enddate
 
@@ -419,7 +434,6 @@ if __name__ == '__main__':
         res_l = ALLStocksProcessPools(list)
         endPools = datetime.datetime.now()
         #print('多进程消耗时间 ' , (endPools - startPools).total_seconds())
-
         time = datetime.datetime.now()
         listtemp5 = []
         for res in res_l:
@@ -427,17 +441,25 @@ if __name__ == '__main__':
             time = datetime.datetime.now()
             print('正在提取结果：  ', listtemp5.__len__(),'   ; 上次消耗时间 ' , spend)
             try:
-                listtemp5.append(res.get())
+                item = res.get()
+                adfitem = item[2]
+                import math
+                if adfitem is None or math.isnan(adfitem) :
+                    continue
+                listtemp5.append(item)
                 #df_result = df_result.append(res.get(), ignore_index=False) #df_result.append(res.get())
             except Exception as e:
                 print('traceback.print_exc():', e)
                 traceback.print_exc()
-        #print('list5= ' , listtemp5)
-        df_result = df_result.append(listtemp5)
+        print('list5= ' , listtemp5)
+        import heapq
+        listtemp6 = heapq.nlargest(5, listtemp5, key=lambda x: -x[2])
+        df_result2 = pd.DataFrame(listtemp6, columns=['A', 'B', 'adf'])
+        #df_result = df_result.append(listtemp5)
     end = datetime.datetime.now()
     #print('消耗时间 ' , (end - start).total_seconds())
-    df_result = df_result.dropna()#去除NAN
-    df_result2 = df_result.sort_values(by = 'adf',axis = 0,ascending = True )#排序adf
+    #df_result = df_result.dropna()#去除NAN
+    #df_result2 = df_result.sort_values(by = 'adf',axis = 0,ascending = True )#排序adf
 
     print(df_result2)
     #print(df_result2.dropna() )
