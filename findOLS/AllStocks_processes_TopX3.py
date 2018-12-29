@@ -409,7 +409,7 @@ if __name__ == '__main__':
 
     startdate = '2015-12-09'
     enddate = '2018-12-23'
-    loopnum = 100000 #最大比较次数        # 100000约需要20分钟
+    loopnum = 20000 #最大比较次数        # 100000约需要20分钟
     dict['startdate'] = startdate
     dict['enddate'] = enddate
 
@@ -453,7 +453,7 @@ if __name__ == '__main__':
                 traceback.print_exc()
         print('list5= ' , listtemp5)
         import heapq
-        listtemp6 = heapq.nlargest(5, listtemp5, key=lambda x: -x[2])
+        listtemp6 = heapq.nlargest(500, listtemp5, key=lambda x: -x[2])
         df_result2 = pd.DataFrame(listtemp6, columns=['A', 'B', 'adf'])
         #df_result = df_result.append(listtemp5)
     end = datetime.datetime.now()
@@ -466,6 +466,13 @@ if __name__ == '__main__':
     print('消耗时间 ' , (end - start).total_seconds())
     print('多进程消耗时间 ' , (endPools - startPools).total_seconds())
     df_result2.to_csv('%s_%s_%s_%s_Result.csv'% (end.year, end.month, end.day, end.timestamp()))
+
+
+    import sys as sys
+
+    a = [x for x in range(1000)]
+    print ('对象大小 ', sys.getsizeof(df_result2))
+
     #bb=pd.DataFrame(df_result2)
     #print(bb)
     showTop10(5,df_result2)
