@@ -317,9 +317,14 @@ def ALLStocksProcessPools(list):#循环比较多进程
                 break
             i = i + 1
             # print (index)
-            print('提交任务   ', index, ' ', index2)
+            print('提交第', i, '任务   ', index, ' ', index2)
             insertRow = pool.apply_async(compareTask, (index, index2, i, dict), callback=None)#apply_async(func[, args[, kwds[, callback[, error_callback]]]])
             #if insertRow.get() is not None:
+            print('任务队列大小: ', pool._taskqueue._qsize())
+            if pool._taskqueue._qsize() > 1000000:#防止任务队列内存占用过大
+                time.sleep(10) # 休眠10秒
+            #import sys as sys
+            #print ('对象大小 ', sys.getsizeof(pool._cache))
             res_l.append(insertRow)
             #print(insertRow.get())
             #df_result = df_result.append(insertRow, ignore_index=False)
@@ -409,7 +414,7 @@ if __name__ == '__main__':
 
     startdate = '2015-12-09'
     enddate = '2018-12-23'
-    loopnum = 20000 #最大比较次数        # 100000约需要20分钟
+    loopnum = 20000000 #最大比较次数        # 100000约需要20分钟
     dict['startdate'] = startdate
     dict['enddate'] = enddate
 
@@ -468,10 +473,10 @@ if __name__ == '__main__':
     df_result2.to_csv('%s_%s_%s_%s_Result.csv'% (end.year, end.month, end.day, end.timestamp()))
 
 
-    import sys as sys
+    '''import sys as sys
 
     a = [x for x in range(1000)]
-    print ('对象大小 ', sys.getsizeof(df_result2))
+    print ('对象大小 ', sys.getsizeof(df_result2))'''
 
     #bb=pd.DataFrame(df_result2)
     #print(bb)
