@@ -302,19 +302,59 @@ def ALLStocksPools(list):#循环比较多线程
     return df_result
 
 
-def ALLStocksProcessPools(list):#循环比较多进程
-    res_l=[]
-    start = time.time()
+def poolpre():
     from multiprocessing import cpu_count
     #print(cpu_count())
     pool = Pool(cpu_count()+2)
+    return pool
+def saveMiddle(pool, res_l):
+    print("保存中间结果~~~~~~~~~~~~~~~~~~~~~~")
+    pool.close()
+    pool.join()   #调用join之前，先调用close函数，否则会出错。执行完close后不会有新的进程加入到pool,join函数等待所有子进程结束
+    addList(res_l)
+
+def addList(res_l):
+    listtemp5 = []
+    global listTop
+    for res in res_l:
+        #spend = (timest - datetime.datetime.now()).total_seconds()
+        #time = datetime.datetime.now()
+        #print('正在提取结果：  ', listtemp5.__len__(),'   ; 上次消耗时间 ' , spend)
+        try:
+            item = res.get()
+            adfitem = item[2]
+            import math
+            if adfitem is None or math.isnan(adfitem) :
+                continue
+            listtemp5.append(item)
+            #df_result = df_result.append(res.get(), ignore_index=False) #df_result.append(res.get())
+        except Exception as e:
+            print('traceback.print_exc():', e)
+            traceback.print_exc()
+    if listTop is not None:
+        listtemp5.extend(listTop)
+    print('list5= ' , listtemp5)
+    #import time
+    #time.sleep(100) # 休眠10秒
+    import heapq
+    listTop = heapq.nlargest(500, listtemp5, key=lambda x: -x[2])
+
+def ALLStocksProcessPools(list):#循环比较多进程
+    res_l=[]
+    start = time.time()
+    pool = poolpre()
     list2 = list
+    maxMemoryloop = 100000 #中间结果保存内存数量
     i = 0 #计数器
     for index, row in list.iterrows():
         # print(index, row)
         for index2, row2 in list2.iterrows():
             if i >= loopnum:
                 break
+            if i % maxMemoryloop == 0 and i != 0:
+                saveMiddle(pool,res_l)
+                res_l=[]
+                pool = poolpre()
             i = i + 1
             # print (index)
             print('提交第', i, '任务   ', index, ' ', index2)
@@ -328,9 +368,7 @@ def ALLStocksProcessPools(list):#循环比较多进程
             res_l.append(insertRow)
             #print(insertRow.get())
             #df_result = df_result.append(insertRow, ignore_index=False)
-    print("Mark~ Mark~ Mark~~~~~~~~~~~~~~~~~~~~~~")
-    pool.close()
-    pool.join()   #调用join之前，先调用close函数，否则会出错。执行完close后不会有新的进程加入到pool,join函数等待所有子进程结束
+
     print ("Sub-process(es) done.")
     stop = time.time()
     print ('delay: %.3fs' % (stop - start))
@@ -379,32 +417,9 @@ def sayHi(num):#作废
     #print(num)
     return insertRow
 
-'''def runALLStocksProcessPools():
-    from multiprocessing import cpu_count
-        max_workers = cpu_count() * 2 + 2
-        list = ts.get_stock_basics()
-        startPools = datetime.datetime.now()
-        res_l = ALLStocksProcessPools(list)
-        endPools = datetime.datetime.now()
-        #print('多进程消耗时间 ' , (endPools - startPools).total_seconds())
-
-        time = datetime.datetime.now()
-        listtemp5 = []
-        for res in res_l:
-            spend = (time - datetime.datetime.now()).total_seconds()
-            time = datetime.datetime.now()
-            print('正在提取结果：  ', listtemp5.__len__(),'   ; 上次消耗时间 ' , spend)
-            try:
-                listtemp5.append(res.get())
-                #df_result = df_result.append(res.get(), ignore_index=False) #df_result.append(res.get())
-            except Exception as e:
-                print('traceback.print_exc():', e)
-                traceback.print_exc()
-        print('list5= ' , listtemp5)
-        df_result = pd.DataFrame(listtemp5, columns=['A', 'B', 'adf'])
-        #df_result = df_result.append(listtemp5)'''
 
 
+listTop = None
 if __name__ == '__main__':
     plt.rcParams['font.family'] = 'SimHei' #解决plt中文乱码
     m = Manager()
@@ -436,30 +451,12 @@ if __name__ == '__main__':
         max_workers = cpu_count() * 2 + 2
         list = ts.get_stock_basics()
         startPools = datetime.datetime.now()
-        res_l = ALLStocksProcessPools(list)
+        ALLStocksProcessPools(list)
         endPools = datetime.datetime.now()
         #print('多进程消耗时间 ' , (endPools - startPools).total_seconds())
-        time = datetime.datetime.now()
-        listtemp5 = []
-        for res in res_l:
-            spend = (time - datetime.datetime.now()).total_seconds()
-            time = datetime.datetime.now()
-            print('正在提取结果：  ', listtemp5.__len__(),'   ; 上次消耗时间 ' , spend)
-            try:
-                item = res.get()
-                adfitem = item[2]
-                import math
-                if adfitem is None or math.isnan(adfitem) :
-                    continue
-                listtemp5.append(item)
-                #df_result = df_result.append(res.get(), ignore_index=False) #df_result.append(res.get())
-            except Exception as e:
-                print('traceback.print_exc():', e)
-                traceback.print_exc()
-        print('list5= ' , listtemp5)
-        import heapq
-        listtemp6 = heapq.nlargest(500, listtemp5, key=lambda x: -x[2])
-        df_result2 = pd.DataFrame(listtemp6, columns=['A', 'B', 'adf'])
+        #timest = datetime.datetime.now()
+
+        df_result2 = pd.DataFrame(listTop, columns=['A', 'B', 'adf'])
         #df_result = df_result.append(listtemp5)
     end = datetime.datetime.now()
     #print('消耗时间 ' , (end - start).total_seconds())
