@@ -344,7 +344,7 @@ def ALLStocksProcessPools(list):#循环比较多进程
     start = time.time()
     pool = poolpre()
     list2 = list
-    maxMemoryloop = 100000 #中间结果保存内存数量
+    maxMemoryloop = 10000 #中间结果保存内存数量
     i = 0 #计数器
     for index, row in list.iterrows():
         # print(index, row)
@@ -368,7 +368,7 @@ def ALLStocksProcessPools(list):#循环比较多进程
             res_l.append(insertRow)
             #print(insertRow.get())
             #df_result = df_result.append(insertRow, ignore_index=False)
-
+    saveMiddle(pool,res_l)
     print ("Sub-process(es) done.")
     stop = time.time()
     print ('delay: %.3fs' % (stop - start))
@@ -429,7 +429,7 @@ if __name__ == '__main__':
 
     startdate = '2015-12-09'
     enddate = '2018-12-23'
-    loopnum = 20000000 #最大比较次数        # 100000约需要20分钟
+    loopnum = 50000 #最大比较次数        # 100000约需要20分钟
     dict['startdate'] = startdate
     dict['enddate'] = enddate
 
