@@ -27,6 +27,7 @@ X, y = make_classification(n_samples=1000,
                            n_classes=2,
                            random_state=0,
                            shuffle=False)
+print(X,y)
 
 # Build a forest and compute the feature importances
 forest = ExtraTreesClassifier(n_estimators=250,

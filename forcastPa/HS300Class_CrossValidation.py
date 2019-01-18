@@ -98,6 +98,35 @@ def addFeature(snpret):
     #snpret = FU.BBANDS(snpret)
     return snpret
 
+def plot_forest_importances(X, y):
+    import matplotlib.pyplot as plt
+    from sklearn.ensemble import ExtraTreesClassifier
+
+    # Build a forest and compute the feature importances
+    forest = ExtraTreesClassifier(n_estimators=250,
+                                  random_state=0)
+
+    forest.fit(X, y)
+    importances = forest.feature_importances_
+    std = np.std([tree.feature_importances_ for tree in forest.estimators_],
+                 axis=0)
+    indices = np.argsort(importances)[::-1]
+
+    # Print the feature ranking
+    print("Feature ranking:")
+
+    for f in range(X.shape[1]):
+        print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+
+    # Plot the feature importances of the forest
+    plt.figure()
+    plt.title("Feature importances")
+    plt.bar(range(X.shape[1]), importances[indices],
+           color="r", yerr=std[indices], align="center")
+    plt.xticks(range(X.shape[1]), indices)
+    plt.xlim([-1, X.shape[1]])
+    plt.show()
+
 if __name__ == "__main__":
     startdate  = '2011-05-01'
     enddate  = '2018-12-29'
@@ -119,8 +148,9 @@ if __name__ == "__main__":
     X = snpret[["CCI","Close","换手率","Volume","Today","Lag1","Lag2","Lag3","Lag4","Lag5","Upper BollingerBand",
                 "Lower BollingerBand","EVM","ForceIndex","SMA","Rate of Change","OBV","AD"]]
     y = snpret["Direction"]
+    #print(y)
 
-    # The test data is split into two parts: Before and after 1st Jan 2005.
+    '''# The test data is split into two parts: Before and after 1st Jan 2005.
     start_test = datetime.datetime(2018,1,1)
 
     # Create training and test sets
@@ -130,20 +160,21 @@ if __name__ == "__main__":
     y_test = y[y.index >= start_test]
     #print(X_test)
     #print(y_test)
-    #print(y_test.shape)
+    #print(y_test.shape)'''
 
     # Create the (parametrised) models
-    print("Hit Rates/Confusion Matrices:\n")
-    models = [("LR", LogisticRegression()),
-              ("LDA", LDA()),
-              ("QDA", QDA()),
-              ("LSVC", LinearSVC()),
-              ("RSVM", SVC(
-              	C=1000000.0, cache_size=200, class_weight=None,
-                coef0=0.0, degree=3, gamma=0.0001, kernel='rbf',
-                max_iter=-1, probability=False, random_state=None,
-                shrinking=True, tol=0.001, verbose=False)
-              ),
+    #print("Hit Rates/Confusion Matrices:\n")
+    models = [#("LR", LogisticRegression()),
+              #("LDA", LDA()),
+              #("QDA", QDA()),
+              #("LSVC", LinearSVC()),
+              #("RSVM", SVC(
+              #	C=1000000.0, cache_size=200, class_weight=None,
+              #  coef0=0.0, degree=3, gamma=0.0001, kernel='rbf',
+              #  max_iter=-1, probability=False, random_state=None,
+              #  shrinking=True, tol=0.001, verbose=False)
+              #),
+
               ("RF", RandomForestClassifier(
               	n_estimators=1000, criterion='gini',
                 max_depth=None, min_samples_split=2,
@@ -153,19 +184,46 @@ if __name__ == "__main__":
               )]
 
 
+
+
     #print(X_train,y_train)
     #print(np.isnan(X_train).any())#判断是否有空值
     #print(np.isnan(y_train).any())
     # Iterate through the models
     for m in models:
 
-        # Train each of the models on the training set
-        m[1].fit(X_train, y_train)
+        X = X.reset_index(drop=True)
+        print(X)
+        #y = y.reset_index(drop=True)
+        #print(y)
 
-        # Make an array of predictions on the test set
-        pred = m[1].predict(X_test)
+        from sklearn.model_selection import KFold
+        kf  = KFold(n_splits=5,shuffle=False)
 
-        # Output the hit-rate and the confusion matrix for each model
-        print("%s:\n%0.3f" % (m[0], m[1].score(X_test, y_test)))
-        #print(pred, y_test)
-        print("%s\n" % confusion_matrix(y_test, pred, labels=[-1.0, 1.0]))#labels=["ant", "bird", "cat"]
+        for train_index, test_index in kf.split(X):
+            #print(train_index, test_index)
+            #print(X.loc[[0,1,2]])
+
+            #X_test =
+            #y_train = y[train_index]
+            #y_test = y[test_index]
+            #X_train = X.loc[train_index]
+            #print(X_train)
+            X_train, X_test, y_train, y_test = X.loc[train_index], X.loc[test_index], y[train_index],  y[test_index] # 这里的X_train，y_train为第iFold个fold的训练集，X_val，y_val为validation set
+            #print(X_train, X_test, y_train, y_test)
+            print('======================================')
+
+
+            # Train each of the models on the training set
+            m[1].fit(X_train, y_train)
+
+            # Make an array of predictions on the test set
+            pred = m[1].predict(X_test)
+
+            # Output the hit-rate and the confusion matrix for each model
+            print("%s:\n%0.3f" % (m[0], m[1].score(X_test, y_test)))
+            #print(pred, y_test)
+            print("%s\n" % confusion_matrix(y_test, pred, labels=[-1.0, 1.0]))#labels=["ant", "bird", "cat"]
+
+        #Feature importances with forests of trees
+        plot_forest_importances(X, y)
