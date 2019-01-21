@@ -75,7 +75,7 @@ def create_lagged_series(symbol, startdate, enddate, lags=5):
     #print(tsret)
 
     # Create the "Direction" column (+1 or -1) indicating an up/down day
-    tsret["TargetValue"] = tsret["Today"].shift(-1)
+    tsret["TargetValue"] = tsret["Close"].shift(-1)
     tsret = tsret[tsret.index >= startdate]
 
     return tsret
@@ -128,7 +128,7 @@ def plot_forest_importances(X, y):
     plt.show()
 
 if __name__ == "__main__":
-    startdate  = '2011-05-01'
+    startdate  = '2014-01-01'
     enddate  = '2018-12-29'
     symbol = '600016'
     # Create a lagged series of the S&P500 US stock market index
@@ -147,6 +147,7 @@ if __name__ == "__main__":
     # values, with direction as the response
     X = snpret[["CCI","Close","换手率","Volume","Today","Lag1","Lag2","Lag3","Lag4","Lag5","Upper BollingerBand",
                 "Lower BollingerBand","EVM","ForceIndex","SMA","Rate of Change","OBV","AD"]]
+    #X = snpret[["Close"]]
     y = snpret["TargetValue"]
     #print(y)
 
@@ -162,56 +163,60 @@ if __name__ == "__main__":
     #print(y_test)
     #print(y_test.shape)'''
 
+    ####3.1决策树回归####
+    from sklearn import tree
+    model_DecisionTreeRegressor = tree.DecisionTreeRegressor()
+    ####3.2线性回归####
+    from sklearn import linear_model
+    model_LinearRegression = linear_model.LinearRegression()
+    ####3.3SVM回归####
+    from sklearn import svm
+    model_SVR = svm.SVR()
+    ####3.4KNN回归####
+    from sklearn import neighbors
+    model_KNeighborsRegressor = neighbors.KNeighborsRegressor()
+    ####3.5随机森林回归####
+    from sklearn import ensemble
+    model_RandomForestRegressor = ensemble.RandomForestRegressor(n_estimators=20)#这里使用20个决策树
+    ####3.6Adaboost回归####
+    from sklearn import ensemble
+    model_AdaBoostRegressor = ensemble.AdaBoostRegressor(n_estimators=50)#这里使用50个决策树
+    ####3.7GBRT回归####
+    from sklearn import ensemble
+    model_GradientBoostingRegressor = ensemble.GradientBoostingRegressor(n_estimators=100)#这里使用100个决策树
+    ####3.8Bagging回归####
+    from sklearn.ensemble import BaggingRegressor
+    model_BaggingRegressor = BaggingRegressor()
+    ####3.9ExtraTree极端随机树回归####
+    from sklearn.tree import ExtraTreeRegressor
+
     # Create the (parametrised) models
     #print("Hit Rates/Confusion Matrices:\n")
-    models = [#("LR", LogisticRegression()),
-              #("LDA", LDA()),
-              #("QDA", QDA()),
-              #("LSVC", LinearSVC()),
-              #("RSVM", SVC(
-              #	C=1000000.0, cache_size=200, class_weight=None,
-              #  coef0=0.0, degree=3, gamma=0.0001, kernel='rbf',
-              #  max_iter=-1, probability=False, random_state=None,
-              #  shrinking=True, tol=0.001, verbose=False)
-              #),
-
-              ("RF", RandomForestClassifier(
-              	n_estimators=1000, criterion='gini',
-                max_depth=None, min_samples_split=2,
-                min_samples_leaf=1, max_features='auto',
-                bootstrap=True, oob_score=False, n_jobs=1,
-                random_state=None, verbose=0)
+    models = [
+              (
+                  "model_DecisionTreeRegressor", model_DecisionTreeRegressor
+              ),
+              (
+                  "model_LinearRegression", model_LinearRegression
+              ),
+              (
+                  "model_SVR", model_SVR
+              ),
+              (
+                  "model_KNeighborsRegressor", model_KNeighborsRegressor
+              ),
+              (
+                  "model_RandomForestRegressor", model_RandomForestRegressor
+              ),
+              (
+                  "model_AdaBoostRegressor", model_AdaBoostRegressor
+              ),
+              (
+                  "model_GradientBoostingRegressor", model_GradientBoostingRegressor
+              ),
+              (
+                  "model_BaggingRegressor", model_BaggingRegressor
               )
-
-
-              ###########3.具体方法选择##########
-                ####3.1决策树回归####
-                from sklearn import tree
-                model_DecisionTreeRegressor = tree.DecisionTreeRegressor()
-                ####3.2线性回归####
-                from sklearn import linear_model
-                model_LinearRegression = linear_model.LinearRegression()
-                ####3.3SVM回归####
-                from sklearn import svm
-                model_SVR = svm.SVR()
-                ####3.4KNN回归####
-                from sklearn import neighbors
-                model_KNeighborsRegressor = neighbors.KNeighborsRegressor()
-                ####3.5随机森林回归####
-                from sklearn import ensemble
-                model_RandomForestRegressor = ensemble.RandomForestRegressor(n_estimators=20)#这里使用20个决策树
-                ####3.6Adaboost回归####
-                from sklearn import ensemble
-                model_AdaBoostRegressor = ensemble.AdaBoostRegressor(n_estimators=50)#这里使用50个决策树
-                ####3.7GBRT回归####
-                from sklearn import ensemble
-                model_GradientBoostingRegressor = ensemble.GradientBoostingRegressor(n_estimators=100)#这里使用100个决策树
-                ####3.8Bagging回归####
-                from sklearn.ensemble import BaggingRegressor
-                model_BaggingRegressor = BaggingRegressor()
-                ####3.9ExtraTree极端随机树回归####
-                from sklearn.tree import ExtraTreeRegressor
-                model_ExtraTreeRegressor = ExtraTreeRegressor()
               ]
 
 
@@ -229,7 +234,7 @@ if __name__ == "__main__":
         #print(y)
 
         from sklearn.model_selection import KFold
-        kf  = KFold(n_splits=5,shuffle=False)
+        kf  = KFold(n_splits=2,shuffle=False)
 
         for train_index, test_index in kf.split(X):
             #print(train_index, test_index)
@@ -241,20 +246,38 @@ if __name__ == "__main__":
             #X_train = X.loc[train_index]
             #print(X_train)
             X_train, X_test, y_train, y_test = X.loc[train_index], X.loc[test_index], y[train_index],  y[test_index] # 这里的X_train，y_train为第iFold个fold的训练集，X_val，y_val为validation set
-            #print(X_train, X_test, y_train, y_test)
+            print(X_train, X_test, y_train, y_test)
             print('======================================')
 
 
+
             # Train each of the models on the training set
+            from numpy import array
+            #m[1].fit(array(X_train), array(y_train))
+            #X_train = array(X_train)
+            #y_train = array(y_train)
+            #print('看看吧', X_train, y_train)
+            #model_DecisionTreeRegressor.fit(X_train, y_train)
+            print("正在训练%s模型：" % m[0])
             m[1].fit(X_train, y_train)
 
             # Make an array of predictions on the test set
             pred = m[1].predict(X_test)
 
             # Output the hit-rate and the confusion matrix for each model
+            score = m[1].score(X_test, y_test)
             print("%s:\n%0.3f" % (m[0], m[1].score(X_test, y_test)))
-            #print(pred, y_test)
-            print("%s\n" % confusion_matrix(y_test, pred, labels=[-1.0, 1.0]))#labels=["ant", "bird", "cat"]
+            #print("%s\n" % confusion_matrix(y_test, pred, labels=[-1.0, 1.0]))#labels=["ant", "bird", "cat"]
+
+            result = m[1].predict(X_test)
+            import matplotlib.pyplot as plt
+            plt.figure()
+            plt.plot(np.arange(len(result)), y_test,'go-',label='true value')
+            plt.plot(np.arange(len(result)),result,'ro-',label='predict value')
+            plt.title('score: %f'%score)
+            plt.legend()
+            plt.show()
+
 
         #Feature importances with forests of trees
-        plot_forest_importances(X, y)
+        #plot_forest_importances(X, y)

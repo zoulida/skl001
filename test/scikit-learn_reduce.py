@@ -23,6 +23,7 @@ x_test ,y_test = test[:,:2], test[:,2] # 同上,不过这里的y没有噪声
 
 ###########2.回归部分##########
 def try_different_method(model):
+    print(x_train,y_train)
     model.fit(x_train,y_train)
     score = model.score(x_test, y_test)
     result = model.predict(x_test)
