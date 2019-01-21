@@ -224,7 +224,7 @@ if __name__ == "__main__":
 
     #print(X_train,y_train)
     #print(np.isnan(X_train).any())#判断是否有空值
-    #print(np.isnan(y_train).any())
+    #print(np.isnan(y_train).any()) 
     # Iterate through the models
     for m in models:
 
