@@ -257,7 +257,7 @@ if __name__ == "__main__":
             #X_train = array(X_train)
             #y_train = array(y_train)
             #print('看看吧', X_train, y_train)
-            #model_DecisionTreeRegressor.fit(X_train, y_train) 
+            #model_DecisionTreeRegressor.fit(X_train, y_train)
             print("正在训练%s模型：" % m[0])
             m[1].fit(X_train, y_train)
 
