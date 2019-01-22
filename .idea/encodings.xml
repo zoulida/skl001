@@ -5,6 +5,7 @@
     <file url="file://$PROJECT_DIR$/FeatureBase/Ta2Utils.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/FeatureBase/Ta3Utils.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/FeatureBase/TalibUtils.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/StorckList/ConditionList.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/findOLS/MemorySize.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/findOLS/dbQueryPools.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/findOLS/dbQueryTools.py" charset="UTF-8" />
@@ -12,6 +13,7 @@
     <file url="file://$PROJECT_DIR$/forcastPa/HS300Class.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/forcastPa/HS300Class_CrossValidation.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/forcastPa/HS300Reduce_CrossValidation.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/forcastPa/HS300Reduce_CrossValidationDEF.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/forcastPa/forecast.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/sparse_covariance_model/plot_stock_market.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/test/bar.py" charset="UTF-8" />

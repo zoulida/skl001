@@ -127,10 +127,9 @@ def plot_forest_importances(X, y):
     plt.xlim([-1, X.shape[1]])
     plt.show()
 
-if __name__ == "__main__":
-    startdate  = '2014-01-01'
-    enddate  = '2018-12-29'
-    symbol = '600016'
+#if __name__ == "__main__":
+def reduceMain(symbol = '600016', startdate  = '2014-01-01', enddate  = '2018-12-29'):
+
     # Create a lagged series of the S&P500 US stock market index
     snpret = create_lagged_series(
     	symbol, startdate,
@@ -151,17 +150,6 @@ if __name__ == "__main__":
     y = snpret["TargetValue"]
     #print(y)
 
-    '''# The test data is split into two parts: Before and after 1st Jan 2005.
-    start_test = datetime.datetime(2018,1,1)
-
-    # Create training and test sets
-    X_train = X[X.index < start_test]
-    X_test = X[X.index >= start_test]
-    y_train = y[y.index < start_test]
-    y_test = y[y.index >= start_test]
-    #print(X_test)
-    #print(y_test)
-    #print(y_test.shape)'''
 
     ####3.1决策树回归####
     from sklearn import tree
@@ -189,6 +177,7 @@ if __name__ == "__main__":
     model_BaggingRegressor = BaggingRegressor()
     ####3.9ExtraTree极端随机树回归####
     from sklearn.tree import ExtraTreeRegressor
+    model_ExtraTreeRegressor = ExtraTreeRegressor()
 
     # Create the (parametrised) models
     #print("Hit Rates/Confusion Matrices:\n")
@@ -216,11 +205,11 @@ if __name__ == "__main__":
               ),
               (
                   "model_BaggingRegressor", model_BaggingRegressor
+              ),
+              (
+                  "model_ExtraTreeRegressor", model_ExtraTreeRegressor
               )
               ]
-
-
-
 
     #print(X_train,y_train)
     #print(np.isnan(X_train).any())#判断是否有空值
@@ -240,19 +229,12 @@ if __name__ == "__main__":
             #print(train_index, test_index)
             #print(X.loc[[0,1,2]])
 
-            #X_test =
-            #y_train = y[train_index]
-            #y_test = y[test_index]
-            #X_train = X.loc[train_index]
-            #print(X_train)
             X_train, X_test, y_train, y_test = X.loc[train_index], X.loc[test_index], y[train_index],  y[test_index] # 这里的X_train，y_train为第iFold个fold的训练集，X_val，y_val为validation set
             print(X_train, X_test, y_train, y_test)
             print('======================================')
 
-
-
             # Train each of the models on the training set
-            from numpy import array
+            #from numpy import array
             #m[1].fit(array(X_train), array(y_train))
             #X_train = array(X_train)
             #y_train = array(y_train)

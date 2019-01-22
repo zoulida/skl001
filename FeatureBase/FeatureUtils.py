@@ -56,6 +56,12 @@ def SMA(data, ndays=12):
     data = data.join(SMA)
     return data
 
+# Simple Moving Average of Volume
+def ADV(data, ndays=12):
+    ADV = pd.Series(pd.rolling_mean(data['成交金额'], ndays), name = 'ADV')
+    data = data.join(ADV)
+    return data
+
 # Exponentially-weighted Moving Average
 def EWMA(data, ndays=12):
     EMA = pd.Series(pd.ewma(data['Close'], span = ndays, min_periods = ndays - 1),

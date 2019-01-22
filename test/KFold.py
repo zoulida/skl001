@@ -6,7 +6,7 @@ y = np.random.choice([1,2],12,p=[0.4,0.6])
 
 print(X)
 print(y)
-kf = KFold(n_splits=5,shuffle=False)
+kf = KFold(n_splits=2,shuffle=False)
 for train_index , test_index in kf.split(X):
     print('train_index:%s , test_index: %s ' %(train_index,test_index))
 
