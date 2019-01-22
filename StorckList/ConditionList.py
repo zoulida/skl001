@@ -65,5 +65,6 @@ if __name__ == "__main__":
     #CL.getLastOneAndADV('600016')
     CL.getDFHS300andADV()
     df = CL.dataAndADV
-    frame = df.sort(columns = ['ADV'],axis = 0,ascending = True)
+    #frame = df.sort(columns = ['ADV'],axis = 0,ascending = True)
+    frame = df.sort_values(by = 'ADV',axis = 0,ascending = True)
     print(frame)
