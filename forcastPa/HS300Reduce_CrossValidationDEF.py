@@ -14,7 +14,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.lda import LDA
 from sklearn.metrics import confusion_matrix
 from sklearn.qda import QDA
-from sklearn.svm import LinearSVC, SVC
+from sklearn.svm import LinearSVC, SVC 
 
 
 def create_lagged_series(symbol, startdate, enddate, lags=5):
