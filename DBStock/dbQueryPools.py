@@ -39,6 +39,35 @@ def queryMySQL_plot_stock_market(code1, startdate = '2017-12-09', enddate = '201
     db.close()
     return df
 
+def queryMySQL_getLast(code1):#使用连接池
+    '''import datetime
+    now = datetime.now()
+    before = datetime.timedelta(days=-100)'''
+    try:
+        # 调用连接池
+        conn = pool.connection()
+        cur = conn.cursor()
+        code = 'stock_'+code1
+        #sql = 'select * from %s where 日期 between \'%s\'' % (code , startdate) + ' and \'%s\'' % enddate
+        sql = 'SELECT * FROM %s where 日期 in(select max(日期) from %s)' % (code, code)
+        #print(sql)
+        cur.execute(sql)
+        results = cur.fetchall()
+        df = pd.DataFrame(list(results))
+        df.rename(columns={0:'Stamp', 1:'Date',2:'Code', 3:'Name', 4: 'Close', 5:'High', 6:'Low', 7:'Open', 8:'Lcose'
+                           , 9:'涨跌额', 10:'涨跌幅', 11:'换手率', 12:'Volume', 13:'成交金额', 14:'总市值', 15:'流通市值'} , inplace=True)
+        #print(df)
+
+    except IOError:
+        conn.rollback() # 出现异常 回滚事件
+        print("Error: Function happen Error: test()")
+    finally:
+        print("释放资源，数据库连接池")
+        cur.close()
+        conn.close()
+        #查询表结构语句为desc stock_000016
+        return  df
+
 def queryMySQL_plot_stock_market(code1, startdate = '2017-12-09', enddate = '2018-12-09'):#使用连接池
 
     try:
@@ -51,8 +80,8 @@ def queryMySQL_plot_stock_market(code1, startdate = '2017-12-09', enddate = '201
         cur.execute(sql)
         results = cur.fetchall()
         df = pd.DataFrame(list(results))
-        df.rename(columns={0:'stamp', 1:'date',2:'code', 3:'name', 4: 'close', 5:'high', 6:'low', 7:'open', 8:'lcose'
-                           , 9:'涨跌额', 10:'涨跌幅', 11:'换手率', 12:'成交量', 13:'成交金额', 14:'总市值', 15:'流通市值'} , inplace=True)
+        df.rename(columns={0:'Stamp', 1:'Date',2:'Code', 3:'Name', 4: 'Close', 5:'High', 6:'Low', 7:'Open', 8:'Lcose'
+                           , 9:'涨跌额', 10:'涨跌幅', 11:'换手率', 12:'Volume', 13:'成交金额', 14:'总市值', 15:'流通市值'} , inplace=True)
         #print(df)
 
     except IOError:
