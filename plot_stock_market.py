@@ -164,9 +164,9 @@ for symbol in symbols:
     print('Fetching quote history for %r' % symbol, file=sys.stderr)
     url = ('https://raw.githubusercontent.com/scikit-learn/examples-data/'
            'master/financial-data/{}.csv')
-    #print(url.format(symbol))
+    print(url.format(symbol))
     quotes.append(pd.read_csv(url.format(symbol)))
-    #print(quotes)
+    print(quotes)
 
 close_prices = np.vstack([q['close'] for q in quotes])
 open_prices = np.vstack([q['open'] for q in quotes])
