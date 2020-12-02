@@ -129,7 +129,7 @@ class HistoricCSVDataHandler(DataHandler):
                     'datetime', 'open', 'high', 
                     'low', 'close', 'volume', 'adj_close'
                 ]
-            ).sort_values('datetime')
+            )#.sort_values('datetime')
 
             # Combine the index to pad forward values
             if comb_index is None:
