@@ -39,7 +39,7 @@ class ConditionLists:#类范例
 
     def getLastOneAndADV(self, code):
         import DBStock.dbQueryPools as dbpool
-        import tools.timeTool as tT
+        import toolsproject.timeTool as tT
         #print(tT.getDateStrNow(), tT.getDateStrBefore())
         ts = dbpool.queryMySQL_plot_stock_market(code, tT.getDateStrBefore(), tT.getDateStrNow())
         #print(ts)

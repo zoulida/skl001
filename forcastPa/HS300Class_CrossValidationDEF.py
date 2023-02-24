@@ -129,7 +129,7 @@ def plot_forest_importances(X, y):
 
 #if __name__ == "__main__":
 #def reduceMain(symbol = '600016', startdate  = '2014-01-01', enddate  = '2018-12-29'):
-import tools.timeTool as tT
+import toolsproject.timeTool as tT
 def classMain(symbol = '600016', startdate  = tT.getDateStrBefore(100), enddate  = tT.getDateStrNow()):
 
     # Create a lagged series of the S&P500 US stock market index

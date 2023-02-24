@@ -13,13 +13,14 @@ def queryMySQL(code1, startdate = '2017-12-09', enddate = '2018-12-09'):
     ###########################查询刚才操作的成果##################################
 
     # 重新建立数据库连接
-    db = pymysql.connect('localhost', name, password, 'stockDataBase')
+    #db = pymysql.connect('localhost', name, password, 'stockDataBase')
+    db = pymysql.connect(host="localhost", user=name, password=password, database="stockDataBase")
     cursor = db.cursor()
     # 查询数据库并打印内容
     #cursor.execute('select * from stock_600016 where timestamp = 977155200')
     #str = 'select * from stock_600016 where 日期 between %s' % startdata + 'and %s' % enddata
     #print(str)
-    code = 'stock_'+code1
+    code = 'stock_'+ str(code1)
     #print(code)
     sqlstr = 'select * from %s where 日期 between \'%s\'' % (code , startdate) + ' and \'%s\'' % enddate
     #print(sqlstr)
@@ -49,7 +50,8 @@ def queryMySQL_plot_stock_market(code1, startdate = '2017-12-09', enddate = '201
     ###########################查询刚才操作的成果##################################
 
     # 重新建立数据库连接
-    db = pymysql.connect('localhost', name, password, 'stockDataBase')
+    #db = pymysql.connect('localhost', name, password, 'stockDataBase')
+    db = pymysql.connect(host="localhost", user=name, password=password, database="stockDataBase")
     cursor = db.cursor()
     # 查询数据库并打印内容
     #cursor.execute('select * from stock_600016 where timestamp = 977155200')

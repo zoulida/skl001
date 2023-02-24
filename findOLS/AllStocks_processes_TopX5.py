@@ -7,7 +7,9 @@ import time
 import random
 from findOLS import dbQueryTools
 import pandas as pd
-import tushare as ts
+import tools.tusharePro as tp
+ts = tp.getPro()
+#import tushare as ts
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime
@@ -240,13 +242,15 @@ def hs300gogo(list):
 
     for index, row in list.iterrows():
         # print(index, row)
+        code1 = row['成分券代码']
         for index2, row2 in list2.iterrows():
             if i >= loopnum:
                 break
             # print (index)
-            print('开始测试平稳性   ', row.code, ' ', row2.code)
-            ss = compare(row.code, row2.code)
-            insertRow = pd.DataFrame([[row.code, row2.code, ss]], columns=['A', 'B', 'adf'])
+            code2 = row2['成分券代码']
+            print('开始测试平稳性   ', code1, ' ', code2)
+            ss = compare(code1, code2, dict)
+            insertRow = pd.DataFrame([[code1, code2, ss]], columns=['A', 'B', 'adf'])
             df_result = df_result.append(insertRow, ignore_index=False)
             i = i + 1
     return df_result
@@ -259,21 +263,24 @@ def ALLStocksgogo(list):#循环比较
 
     for index, row in list.iterrows():
         # print(index, row)
+        code1 = row['symbol']
         for index2, row2 in list2.iterrows():
             if i >= loopnum:
                 break
             i = i + 1
             # print (index)
-            print('开始测试平稳性   ', index, ' ', index2)
+
+            code2 =  row2['symbol']
+            print('开始测试平稳性   ', code1, ' ', code2)
             #ss = compare(index, index2)
             try:
-                ss = compare(index, index2)
+                ss = compare(code1, code2, dict)
             except Exception as e:
                 print('traceback.print_exc():', e)
                 traceback.print_exc()
                 # 如果以上插入过程出错，跳过这条数据记录，继续往下进行
                 continue  # break'''
-            insertRow = pd.DataFrame([[index, index2, ss]], columns=['A', 'B', 'adf'])
+            insertRow = pd.DataFrame([[code1, code2, ss]], columns=['A', 'B', 'adf'])
             df_result = df_result.append(insertRow, ignore_index=False)
 
     return df_result
@@ -435,12 +442,14 @@ if __name__ == '__main__':
 
     start = datetime.datetime.now()
 
-    stockRange = 'ALLStocksProcessPools' # 用多线程完成
+    stockRange = 'hs300' # 用多线程完成
     if stockRange == 'hs300':
-        list = ts.get_hs300s()
-        df_result = hs300gogo(list)
+        import akshare
+        hs300 = akshare.index_stock_cons_weight_csindex(symbol="000300")#获取沪深300成分股列表
+        #list = ts.index_weight(index_code='399300.SZ', start_date='20180901', end_date='20180930')
+        df_result = hs300gogo(hs300)
     if stockRange == 'all':
-        list = ts.get_stock_basics()
+        list = ts.stock_basic()
         df_result = ALLStocksgogo(list)
     if stockRange == 'allPools':
         max_workers = 10
@@ -449,7 +458,8 @@ if __name__ == '__main__':
     if stockRange == 'ALLStocksProcessPools':
         from multiprocessing import cpu_count
         max_workers = cpu_count() * 2 + 2
-        list = ts.get_stock_basics()
+
+        list = ts.stock_basic()
         startPools = datetime.datetime.now()
         ALLStocksProcessPools(list)
         endPools = datetime.datetime.now()
